@@ -9,10 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 /*
- *  NOMBRE:
- *  APELLIDOS: 
- *  ESTO ES UNA PRUEBA DE GITHUB
- * 
+ *  NOMBRE: Luis 
+ *  APELLIDOS: Jarosz Trujillo
  */
 
 namespace Buscaminas
@@ -21,24 +19,25 @@ namespace Buscaminas
     {
         //declaro el array de botones
         Button[,] matrizBotones;
+        int filas = 15;
+        int columnas = 20;
+        int anchoBoton = 20;
 
         public Form1()
         {
             InitializeComponent();
-            int filas = 15;
-            int columnas = 20;
-            int anchoBoton = 20;
+            
 
             this.Height = columnas * anchoBoton + 40;
             this.Width = filas * anchoBoton + 20;
 
             matrizBotones = new Button[filas, columnas];
-
+            
             for (int i = 0; i < filas; i++)
                 for (int j = 0; j < columnas; j++)
                 {
                     Button boton = new Button();
-                    boton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+                    //boton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
                     boton.Width = anchoBoton;
                     boton.Height = anchoBoton;
                     boton.Location = new Point(i * anchoBoton, j * anchoBoton);
@@ -48,10 +47,16 @@ namespace Buscaminas
                 }
         }
 
-        private void chequeaBoton(object sender, EventArgs e)
-        {
-            (sender as Button).Enabled = false;
-
+        private void chequeaBoton(object sender, EventArgs e){
+            Button b = (sender as Button);
+            int columna = b.Location.X / anchoBoton;
+            int fila = b.Location.Y / anchoBoton;
+            //De esta manera sólo se consigen botones de 3x3
+            for (int i = 12; i < filas; i++){
+              for (int j = 17; j < columnas; j++){
+                   matrizBotones[fila, columna].BackColor = Color.Blue;
+                }
+            }
         }
     }
 }
