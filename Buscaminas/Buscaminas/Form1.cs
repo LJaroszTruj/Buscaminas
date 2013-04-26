@@ -22,7 +22,7 @@ namespace Buscaminas{
         int filas = 15;
         int columnas = 20;
         int anchoBoton = 20;
-        int minas = 30;
+        int minas = 40;
 
 
 
@@ -109,6 +109,7 @@ namespace Buscaminas{
         private void chequeaBoton(object sender, EventArgs e){
 
             //Chequea botón mira en las direcciones alrededor del botón pulsado
+            //(sender as Button).Enabled = false;
             Button b = (sender as Button);
             int columna = b.Location.X / anchoBoton;
             int fila = b.Location.Y / anchoBoton;
@@ -119,11 +120,13 @@ namespace Buscaminas{
             if (matrizBotones[columna, fila].Tag == "0"){
 
                 b.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+                
                 for (int i = -1; i < 2; i++){
                     for (int j = -1; j < 2; j++){
 
                         int f = fila + i;
                         int c = columna + j;
+
                         if ((c < columnas) && (c >= 0) && (f < filas) && (f >= 0)){
 
                             if (matrizBotones[c, f].FlatStyle != System.Windows.Forms.FlatStyle.Flat){
