@@ -13,80 +13,130 @@ using System.Windows.Forms;
  *  APELLIDOS: Jarosz Trujillo
  */
 
-namespace Buscaminas
-{
-    public partial class Form1 : Form
-    {
+namespace Buscaminas{
+
+    public partial class Form1 : Form{
+
         //declaro el array de botones
         Button[,] matrizBotones;
-        int filas = 20;
+        int filas = 15;
         int columnas = 20;
-        int minas = 20;
         int anchoBoton = 20;
+        int minas = 30;
 
 
-        //Si el Tag es 1 es que no hay bomba
-        //Si el Tag es 2 es que hay bomba
 
-        public Form1()
-        {
+
+        // si el tag es 1 es que no hay bomba
+        // si el tag es 2 es que sí hay bomba
+        public Form1(){
+
             InitializeComponent();
-            
 
-            matrizBotones = new Button[filas, columnas];
+            this.Height = filas * anchoBoton + 40;
+            this.Width = columnas * anchoBoton + 20;
 
-            this.Height = columnas * anchoBoton + 40;
-            this.Width = filas * anchoBoton + 20;
-            
-            for (int i = 0; i < filas; i++){
+            matrizBotones = new Button[columnas, filas];
+            //inicializo la matriz de botones
+            for (int i = 0; i < filas; i++)
                 for (int j = 0; j < columnas; j++){
+
                     Button boton = new Button();
                     //boton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
                     boton.Width = anchoBoton;
                     boton.Height = anchoBoton;
-                    boton.Location = new Point(i * anchoBoton, j * anchoBoton);
+                    boton.Location = new Point(j * anchoBoton, i * anchoBoton);
                     boton.Click += chequeaBoton;
-                    boton.Tag = "1";
+                    boton.Tag = "0";
                     matrizBotones[j, i] = boton;
                     panel1.Controls.Add(boton);
+                }
+            //Genera las minas y las coloca en el mapa de forma aleatoria
+            poneMinas();
+            //Según las minas que se tengan al lado, los botones se actualizan
+            cuentaMinas();
+        }
 
+        private void cuentaMinas(){
+            //Cambio los tag para que indiquen el nº de minas que hay alrededor
+            //los dos for anidados externos recorren uno por uno los elementos de la matriz
+            //los dos for anidados interiores recorren los 8 botones alrededor de una casilla 
+            //y suman el número de minas
+            for (int i = 0; i < filas; i++)
+                for (int j = 0; j < columnas; j++){
+                    int numeroBombas = 0;
+
+                    for (int k = -1; k < 2; k++)
+                        for (int l = -1; l < 2; l++){
+                            int f = i + k;
+                            int c = j + l;
+
+                            if ((c < columnas) && (c >= 0) && (f < filas) && (f >= 0)){
+                                if (matrizBotones[c, f].Tag == "B"){
+                                    numeroBombas++;
+                                }
+                            }
+                        }
+                    if ((numeroBombas > 0) && (matrizBotones[j, i].Tag != "B")){
+
+                        matrizBotones[j, i].Tag = numeroBombas;
+                        matrizBotones[j, i].Text = numeroBombas.ToString();
                     }
-                poneMinas();
                 }
         }
 
         private void poneMinas(){
+
             Random aleatorio = new Random();
             int x = 0, y = 0;
             for (int i = 0; i < minas; i++){
+
                 x = aleatorio.Next(filas);
                 y = aleatorio.Next(columnas);
 
-                    while(!matrizBotones[y, x].Tag.Equals("1")) {
-                        x = aleatorio.Next(filas);
-                        y = aleatorio.Next(columnas);              
-                    }
-                    matrizBotones[y, x].Tag = "2";
-                    matrizBotones[y, x].Text = "B";
+                while (!matrizBotones[y, x].Tag.Equals("0")){
+                    x = aleatorio.Next(filas);
+                    y = aleatorio.Next(columnas);
+                }
+                matrizBotones[y, x].Tag = "B";
+                matrizBotones[y, x].Text = "B";
+                matrizBotones[y, x].BackColor = Color.Sienna;
             }
-        }
+
+        } 
+
 
         private void chequeaBoton(object sender, EventArgs e){
+
+            //Chequea botón mira en las direcciones alrededor del botón pulsado
             Button b = (sender as Button);
             int columna = b.Location.X / anchoBoton;
             int fila = b.Location.Y / anchoBoton;
-            //De esta manera sólo se consigen botones de 3x3
-            
-            for (int i = -1; i < 2; i++){
-              for (int j = -1; j < 2; j++){
-                  if ((columna + j < columnas) &&(columna + j >= 0)
-                     &&(fila + i < filas) && (fila + i >= 0)){
-                         if (matrizBotones[columna + j, fila + i].BackColor != Color.Tomato){
+            int numeroMinasAlrededor = 0;
 
-                             matrizBotones[columna + j, fila + i].BackColor = Color.Tomato;
-                             chequeaBoton(matrizBotones[columna + j, fila + i], e);
-                       }
-                   }
+            //Si el Tag es 0 es porque no hay ninguna mina alrededor. 
+            //si fuera distinto de cero, no tengo que chequear nada mas
+            if (matrizBotones[columna, fila].Tag == "0"){
+
+                b.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+                for (int i = -1; i < 2; i++){
+                    for (int j = -1; j < 2; j++){
+
+                        int f = fila + i;
+                        int c = columna + j;
+                        if ((c < columnas) && (c >= 0) && (f < filas) && (f >= 0)){
+
+                            if (matrizBotones[c, f].FlatStyle != System.Windows.Forms.FlatStyle.Flat){
+
+                                if (numeroMinasAlrededor == 0){
+                                    chequeaBoton(matrizBotones[c, f], e);
+                                }
+                                else{
+                                    numeroMinasAlrededor++;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
